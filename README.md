@@ -8,7 +8,7 @@ My mission is to bridge the technology education gap in Rwanda by delivering inn
 
 ## Dataset Source
 
-The dataset can be found at this [Mendeley datasets link](https://data.mendeley.com/datasets/g36zrks68z/1) and the corresponding dataset file used is [Data SET primary cohort II.xlsx](https://data.mendeley.com/datasets/g36zrks68z/1/files/3051db4b-c14c-4d7a-a92e-909397e8b971).
+The dataset can be found at this [Mendeley datasets link](https://data.mendeley.com/datasets/g36zrks68z/1) and the corresponding dataset file used is [Data SET primary cohort II.xlsx](https://data.mendeley.com/datasets/g36zrks68z/1/files/3051db4b-c14c-4d7a-a92e-909397e8b971). The Pre-processed csv dataset files can be found in this [repository link](https://github.com/degide/linear_regression_model/tree/master/summative/linear_regression/datasets).
 
 ## Documentation
 
