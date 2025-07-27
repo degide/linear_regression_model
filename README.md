@@ -28,7 +28,7 @@ The predictive model for teachers’ post-test scores in SET after CPD training 
 
 Request:
 ```http
-POST https://rwanda-tech-edu-api.example.com/api/predict
+POST https://linear-regression-model-lw2t.onrender.com/api/predict
 {
   "age": 30,
   "gender": "Female",
