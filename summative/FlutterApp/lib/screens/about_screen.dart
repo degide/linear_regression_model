@@ -9,6 +9,7 @@ class AboutScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('About'),
+        backgroundColor: Theme.of(context).primaryColor,
         centerTitle: true,
       ),
       body: Padding(
@@ -16,11 +17,6 @@ class AboutScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'About the App',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
             const Text(
               'This application is designed to estimate a teacher\'s performance score based on key parameters such as age, gender, education level, teaching experience, class size, teaching load, and leadership roles.',
               style: TextStyle(fontSize: 16),

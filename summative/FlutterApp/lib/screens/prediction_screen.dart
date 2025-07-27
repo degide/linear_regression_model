@@ -11,27 +11,18 @@ class PredictionScreen extends StatefulWidget {
 }
 
 class _PredictionScreenState extends State<PredictionScreen> {
-  // Controllers for text fields
   final _ageController = TextEditingController();
   final _yearsTeachingController = TextEditingController();
   final _periodsPerWeekController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
-  // Dropdown values
   String? _gender;
   String? _highestEducation;
   String? _studentCount;
   String? _subjectLeader;
-
-  // Result or error message
   String _result = '';
-
-  // Loading state
   bool _isLoading = false;
 
-  // API endpoint
-  final String _apiUrl = 'https://linear-regression-model-lw2t.onrender.com/api/predict';
-
-  // Dropdown options
   final List<String> _genderOptions = ['Male', 'Female'];
   final List<String> _educationOptions = ['A0', 'A1', 'A2'];
   final List<String> _studentCountOptions = [
@@ -40,30 +31,20 @@ class _PredictionScreenState extends State<PredictionScreen> {
     '20-30',
     '30-40',
     '40-50',
-    '50+'
+    '50+',
   ];
   final List<String> _subjectLeaderOptions = ['Yes', 'No'];
 
-  // Function to make API call
   Future<void> _predict() async {
+    if (_formKey.currentState?.validate() != true) {
+      return;
+    }
     setState(() {
       _isLoading = true;
       _result = '';
     });
 
     try {
-      // Validate inputs
-      if (_ageController.text.isEmpty ||
-          _yearsTeachingController.text.isEmpty ||
-          _periodsPerWeekController.text.isEmpty ||
-          _gender == null ||
-          _highestEducation == null ||
-          _studentCount == null ||
-          _subjectLeader == null) {
-        throw Exception('All fields are required');
-      }
-
-      // Prepare data
       final data = {
         'age': int.parse(_ageController.text),
         'gender': _gender,
@@ -74,10 +55,11 @@ class _PredictionScreenState extends State<PredictionScreen> {
         'subject_leader': _subjectLeader,
       };
 
-      // Make HTTP POST request
       final response = await http
           .post(
-            Uri.parse(_apiUrl),
+            Uri.parse(
+              'https://linear-regression-model-lw2t.onrender.com/api/predict',
+            ),
             headers: {'Content-Type': 'application/json'},
             body: jsonEncode(data),
           )
@@ -85,21 +67,27 @@ class _PredictionScreenState extends State<PredictionScreen> {
 
       if (response.statusCode == 200) {
         final result = jsonDecode(response.body);
-        setState(() {
-          _result = 'Predicted Score: ${result['predicted_score']}%';
-        });
+        if(context.mounted) {
+          setState(() {
+            _result = 'Predicted Score: ${result['predicted_score']}%';
+          });
+        }
       } else {
         final error = jsonDecode(response.body);
-        throw Exception(error['detail'] ?? 'Unknown error');
+        throw Exception(error['detail'] ?? 'Something went wrong');
       }
     } catch (e) {
-      setState(() {
-        _result = 'Error: $e';
-      });
+      if(context.mounted) {
+        setState(() {
+          _result = 'Error: $e';
+        });
+      }
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if(context.mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -108,6 +96,9 @@ class _PredictionScreenState extends State<PredictionScreen> {
     _ageController.dispose();
     _yearsTeachingController.dispose();
     _periodsPerWeekController.dispose();
+    _formKey.currentState?.dispose();
+    _result = '';
+    _isLoading = false;
     super.dispose();
   }
 
@@ -115,157 +106,271 @@ class _PredictionScreenState extends State<PredictionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Predict Teacher Performance'),
+        title: const Text('Prediction'),
+        backgroundColor: Theme.of(context).primaryColor,
         centerTitle: true,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8.0),
         child: Card(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const Text(
-                  'Enter Teacher Details',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 20),
-                TextField(
-                  controller: _ageController,
-                  decoration: InputDecoration(
-                    labelText: 'Age (18-100)',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                    filled: true,
-                    fillColor: Colors.white,
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Text(
+                    'Enter Teacher Details',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
                   ),
-                  keyboardType: TextInputType.number,
-                ),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  decoration: InputDecoration(
-                    labelText: 'Gender',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                    filled: true,
-                    fillColor: Colors.white,
+                  const SizedBox(height: 20),
+                  TextFormField(
+                    controller: _ageController,
+                    decoration: InputDecoration(
+                      labelText: 'Age (18-100)',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter age';
+                      }
+                      final age = int.tryParse(value);
+                      if (age == null || age < 18 || age > 100) {
+                        return 'Age must be between 18 and 100';
+                      }
+                      return null;
+                    },
                   ),
-                  value: _gender,
-                  items: _genderOptions
-                      .map((option) => DropdownMenuItem(
-                            value: option,
-                            child: Text(option),
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _gender = value;
-                    });
-                  },
-                ),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  decoration: InputDecoration(
-                    labelText: 'Highest Education',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                    filled: true,
-                    fillColor: Colors.white,
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    decoration: InputDecoration(
+                      labelText: 'Gender',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                    value: _gender,
+                    items:
+                        _genderOptions
+                            .map(
+                              (option) => DropdownMenuItem(
+                                value: option,
+                                child: Text(option),
+                              ),
+                            )
+                            .toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        _gender = value;
+                      });
+                    },
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please select gender';
+                      }
+                      return null;
+                    },
                   ),
-                  value: _highestEducation,
-                  items: _educationOptions
-                      .map((option) => DropdownMenuItem(
-                            value: option,
-                            child: Text(option),
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _highestEducation = value;
-                    });
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _yearsTeachingController,
-                  decoration: InputDecoration(
-                    labelText: 'Years of Teaching Experience',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                    filled: true,
-                    fillColor: Colors.white,
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    decoration: InputDecoration(
+                      labelText: 'Highest Education',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                    value: _highestEducation,
+                    items:
+                        _educationOptions
+                            .map(
+                              (option) => DropdownMenuItem(
+                                value: option,
+                                child: Text(option),
+                              ),
+                            )
+                            .toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        _highestEducation = value;
+                      });
+                    },
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please select highest education';
+                      }
+                      return null;
+                    },
                   ),
-                  keyboardType: TextInputType.number,
-                ),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  decoration: InputDecoration(
-                    labelText: 'Number of Students in Classes',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                    filled: true,
-                    fillColor: Colors.white,
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _yearsTeachingController,
+                    decoration: InputDecoration(
+                      labelText: 'Years of Teaching Experience',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter years of teaching experience';
+                      }
+                      final years = int.tryParse(value);
+                      if (years == null || years < 0) {
+                        return 'Years of teaching must be a positive number';
+                      }
+                      return null;
+                    },
                   ),
-                  value: _studentCount,
-                  items: _studentCountOptions
-                      .map((option) => DropdownMenuItem(
-                            value: option,
-                            child: Text(option),
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _studentCount = value;
-                    });
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: _periodsPerWeekController,
-                  decoration: InputDecoration(
-                    labelText: 'Periods per Week (0-168)',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                    filled: true,
-                    fillColor: Colors.white,
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    decoration: InputDecoration(
+                      labelText: 'Number of Students in Classes',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                    value: _studentCount,
+                    items:
+                        _studentCountOptions
+                            .map(
+                              (option) => DropdownMenuItem(
+                                value: option,
+                                child: Text(option),
+                              ),
+                            )
+                            .toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        _studentCount = value;
+                      });
+                    },
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please select number of students';
+                      }
+                      return null;
+                    },
                   ),
-                  keyboardType: TextInputType.number,
-                ),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  decoration: InputDecoration(
-                    labelText: 'Subject Leader',
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                    filled: true,
-                    fillColor: Colors.white,
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _periodsPerWeekController,
+                    decoration: InputDecoration(
+                      labelText: 'Periods per Week (0-168)',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                    keyboardType: TextInputType.number,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter periods per week';
+                      }
+                      final periods = int.tryParse(value);
+                      if (periods == null || periods < 0 || periods > 168) {
+                        return 'Periods must be between 0 and 168';
+                      }
+                      return null;
+                    },
                   ),
-                  value: _subjectLeader,
-                  items: _subjectLeaderOptions
-                      .map((option) => DropdownMenuItem(
-                            value: option,
-                            child: Text(option),
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _subjectLeader = value;
-                    });
-                  },
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: _isLoading ? null : _predict,
-                  child: _isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text('Predict'),
-                ),
-                const SizedBox(height: 20),
-                Text(
-                  _result,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: _result.startsWith('Error') ? Colors.red : Colors.green,
-                    fontWeight: FontWeight.bold,
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    decoration: InputDecoration(
+                      labelText: 'Subject Leader',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                    value: _subjectLeader,
+                    items:
+                        _subjectLeaderOptions
+                            .map(
+                              (option) => DropdownMenuItem(
+                                value: option,
+                                child: Text(option),
+                              ),
+                            )
+                            .toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        _subjectLeader = value;
+                      });
+                    },
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please select subject leader status';
+                      }
+                      return null;
+                    },
                   ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: _isLoading ? null : _predict,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Theme.of(context).primaryColor,
+                      foregroundColor: Colors.white,
+                    ),
+                    child:
+                        _isLoading
+                            ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Text('Predict'),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    "Result",
+                    style: TextStyle(
+                      color: Colors.blueGrey,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(16.0),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      _result,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color:
+                            _result.startsWith('Error')
+                                ? Colors.red
+                                : Colors.green,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.start,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

@@ -1,6 +1,6 @@
 # flutter_app
 
-A new Flutter project.
+A flutter app for predicting teachers’ post-test scores in Science and Elementary Technology (SET) after undergoing Continuous Professional Development (CPD) training using a FastAPI backend.
 
 ## Getting Started
 
@@ -14,3 +14,17 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+## Prerequisites
+Ensure Flutter v3.x is installed.
+
+## Setup
+
+- Clone this repository: `git clone https://github.com/degide/linear_regression_model.git`.
+- Navigate to the project directory: `cd [dir]`.
+- Run `flutter pub get` to install dependencies.
+- Start the app: `flutter run`.
+
+## Contributors
+
+- Egide Harerimana <h.egide@alustudent.com>

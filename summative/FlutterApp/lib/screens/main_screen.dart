@@ -13,12 +13,6 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
-  static const List<Widget> _pages = [
-    HomeScreen(),
-    PredictionScreen(),
-    AboutScreen(),
-  ];
-
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -28,25 +22,42 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
+      body:
+          [
+            HomeScreen(changeTab: _onItemTapped),
+            PredictionScreen(),
+            AboutScreen(),
+          ][_selectedIndex],
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _selectedIndex,
+        destinations: [
+          NavigationDestination(
+            icon: Icon(
+              Icons.home_work_outlined,
+              size: 28,
+              color: _selectedIndex == 0 ? Colors.white : Colors.black54,
+            ),
             label: 'Home',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.analytics),
-            label: 'Predict',
+          NavigationDestination(
+            icon: Icon(
+              Icons.analytics_outlined,
+              size: 28,
+              color: _selectedIndex == 1 ? Colors.white : Colors.black54,
+            ),
+            label: 'Prediction',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.info),
+          NavigationDestination(
+            icon: Icon(
+              Icons.info_outlined,
+              size: 28,
+              color: _selectedIndex == 2 ? Colors.white : Colors.black54,
+            ),
             label: 'About',
           ),
         ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Theme.of(context).primaryColor,
-        onTap: _onItemTapped,
+        indicatorColor: Theme.of(context).primaryColor,
+        onDestinationSelected: _onItemTapped,
       ),
     );
   }

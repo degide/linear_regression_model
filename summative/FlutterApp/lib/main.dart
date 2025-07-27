@@ -11,19 +11,20 @@ class TeacherPerformanceApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'SET Teacher Performance Predictor',
+      title: 'SET Teacher Performance Prediction',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
         scaffoldBackgroundColor: Colors.grey[100],
-        appBarTheme: AppBarTheme(
+        appBarTheme: const AppBarTheme(
           backgroundColor: Colors.blueAccent,
-          titleTextStyle: const TextStyle(
+          foregroundColor: Colors.white,
+          titleTextStyle: TextStyle(
             color: Colors.white,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
-          iconTheme: const IconThemeData(color: Colors.white),
+          iconTheme: IconThemeData(color: Colors.white),
         ),
         textTheme: const TextTheme(
           bodyMedium: TextStyle(fontSize: 16, color: Colors.black87),
@@ -32,15 +33,20 @@ class TeacherPerformanceApp extends StatelessWidget {
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            textStyle: const TextStyle(fontSize: 18),
+            textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.normal),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            backgroundColor: Colors.blueAccent,
+            foregroundColor: Colors.white,
           ),
         ),
         cardTheme: CardTheme(
           elevation: 4,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          color: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+          margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         ),
+        //primary: #002C68
+        primaryColor: const Color.fromARGB(255, 0, 91, 218),
       ),
       home: const MainScreen(),
       debugShowCheckedModeBanner: false,
