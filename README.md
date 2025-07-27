@@ -4,7 +4,7 @@ It demonstrates an effect of educational training on teachers' teaching performa
 
 ## Mission & Problem.
 
-Our mission is to bridge the technology education gap in Rwanda by delivering innovative educational programs. The lack of access to quality tech education limits students' opportunities. We address this through targeted training and predictive tools for teachers and students. This enhances teaching quality and student quality and outcomes in Technology.
+My mission is to bridge the technology education gap in Rwanda by delivering innovative educational programs. The lack of access to quality tech education limits students' opportunities. I plan address this through targeted training and predictive tools for teachers and students. This enhances teaching quality and student quality and outcomes in Technology.
 
 ## Documentation
 
